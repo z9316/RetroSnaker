@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>贪吃蛇</title>
+	<style type="text/css">
+	body {font-size:12px;margin:0 auto;}
+	tr{height:20px;width:220px;}
+
+	td{height:20px;width:20px;}
+
+	#north{text-align:center;}
+
+	#center{margin:0 auto;width:220px}
+	</style>
+	<script type="text/javascript" src="jquery.min.js"></script>
+	
+	<script type="text/javascript">
+	var sum=0;
+	var direction = 1;//1=右，2=上，3=左，4=下
+	var oldlist=[];
+	var newlist=[];
+	var fruit;
+	var snake;
+	var setinterval;
+	
+	function Snake(number){
+		this.number = number;
+		this.setNumber = function(number){
+			this.number=number;
+        }
+        this.getNumber = function(){
+			return this.number;
+        }
+		this.clean = function(){
+			$.each(oldlist,function(index,value){
+				var str = ('000'+value).slice(-3);
+				$('#block'+str).css('background-color','white');
+			});
+		}
+		this.show = function(){
+			$.each(newlist,function(index,value){
+				var str = ('000'+value).slice(-3);
+				$('#block'+str).css('background-color','pink');
+			});
+		}
+	}
+	
+	function Fruit(number){
+		this.number = number;
+		this.setNumber = function(number){
+			this.number=number;
+        }
+        this.getNumber = function(){
+			return this.number;
+        }
+		this.clean = function(){
+			var str = ('000'+this.number).slice(-3);
+			$('#block'+str).css('background-color','white');
+		}
+		this.show = function(){
+			var str = ('000'+this.number).slice(-3);
+			$('#block'+str).css('background-color','red');
+		}
+	}
+	
+	function unChongfuNumber(){
+		var innerlist=[]
+		for(var i=1;i<=100;i++){
+			var innerflag=false;
+			for(var j=0;j<newlist.length;j++){
+				if(i ==newlist[j])
+					innerflag = true;
+			}
+			if(!innerflag)
+				innerlist.push(i);
+		}
+		var str = parseInt(Math.random()*innerlist.length);
+		return innerlist[str];
+	}
+	
+	function checklose(number){
+		for(var j=0;j<newlist.length;j++){
+			if(number == newlist[j]){
+				endGame();
+			}
+		}
+	}
+	
+	function endGame(){
+	    clearInterval(setinterval); 
+		document.onkeydown=function(){
+			return false;
+		}
+		$('#score').text(sum);
+	    $('#dialog').css('display','block');
+		return ;
+	}
+	
+	function snakerun(){
+		switch(direction){
+			case 1:
+				snake.clean();
+				var number = snake.getNumber();
+				number = number +1;
+				number = (number-1)%10 == 0?number-10:number;
+				snake.setNumber(number);
+				checklose(number);
+				newlist.push(number);
+				var fruitlocal=fruit.getNumber();
+				if(fruitlocal != number){
+					newlist.shift();
+				}else{
+					sum=sum+1;
+					$('#score').text(sum);
+					fruitlocal = unChongfuNumber();
+					fruit.setNumber(fruitlocal);
+					fruit.show();
+				}
+				snake.show();
+				oldlist=newlist;
+				break;
+			case 2:
+				snake.clean();
+				var number = snake.getNumber();
+				number = number -10;
+				number = number< 1?number+100:number;
+				snake.setNumber(number);
+				checklose(number);
+				newlist.push(number);
+				var fruitlocal=fruit.getNumber();
+				if(fruitlocal != number){
+					newlist.shift();
+				}else{
+				   sum=sum+1;
+				   $('#score').text(sum);
+				   fruitlocal = unChongfuNumber();
+				   fruit.setNumber(fruitlocal);
+				   fruit.show();
+				}
+				snake.show();
+				oldlist=newlist;
+				break;
+			case 3:
+				snake.clean();
+				var number = snake.getNumber();
+				number = number -1;
+				number = number%10 == 0?number+10:number;
+				snake.setNumber(number);
+				checklose(number);
+				newlist.push(number);
+				var fruitlocal=fruit.getNumber();
+				if(fruitlocal != number){
+					newlist.shift();
+				}else{
+			        sum=sum+1;
+					$('#score').text(sum);
+					fruitlocal = unChongfuNumber();
+					fruit.setNumber(fruitlocal);
+					fruit.show();
+				}
+				snake.show();
+				oldlist=newlist;
+				break;
+			case 4:
+				snake.clean();
+				var number = snake.getNumber();
+				number = number +10;
+				number = number> 100?number-100:number;
+				snake.setNumber(number);
+				checklose(number);
+				newlist.push(number);
+				var fruitlocal=fruit.getNumber();
+				if(fruitlocal != number){
+					newlist.shift();
+				}else{
+					sum=sum+1;
+					$('#score').text(sum);
+					fruitlocal = unChongfuNumber();
+					fruit.setNumber(fruitlocal);
+					fruit.show();
+				}
+				snake.show();
+				oldlist=newlist;
+			    break;
+		}
+	
+	}
+	
+	$(function(){
+		 oldlist = [51,52,53,54];
+		 newlist = [51,52,53,54];
+		 snake = new Snake(54);
+		 snake.show();
+		 fruit = new Fruit(5);
+		 fruit.show();
+		 setinterval = setInterval(snakerun,1000);
+         init();
+	});
+	
+	function init(){        
+                document.onkeydown = function(ev){
+                var ev = ev || window.event;
+                switch(ev.keyCode){
+                    case 37://左
+						if(direction != 1){
+							direction=3;
+							snake.clean();
+							var number = snake.getNumber();
+							number = number -1;
+							number = number%10 == 0?number+10:number;
+							snake.setNumber(number);
+							checklose(number);
+							newlist.push(number);
+							var fruitlocal=fruit.getNumber();
+							if(fruitlocal != number){
+								newlist.shift();
+							}else{
+							   sum=sum+1;
+							   $('#score').text(sum);
+							   fruitlocal = unChongfuNumber();
+							   fruit.setNumber(fruitlocal);
+							   fruit.show();
+							}
+							snake.show();
+							oldlist=newlist;
+						}
+                    break;
+                    case 38://上
+					    if(direction != 4){
+							direction=2;
+							snake.clean();
+							var number = snake.getNumber();
+							number = number -10;
+							number = number< 1?number+100:number;
+							snake.setNumber(number);
+							checklose(number);
+							newlist.push(number);
+							var fruitlocal=fruit.getNumber();
+							if(fruitlocal != number){
+								newlist.shift();
+							}else{
+							   sum=sum+1;
+							   $('#score').text(sum);
+							   fruitlocal = unChongfuNumber();
+							   fruit.setNumber(fruitlocal);
+							   fruit.show();
+							}
+							snake.show();
+							oldlist=newlist;
+						}
+                    break;
+                    case 39://右 
+						if(direction != 3){
+							direction=1;
+							snake.clean();
+							var number = snake.getNumber();
+							number = number +1;
+							number = (number-1)%10 == 0?number-10:number;
+							snake.setNumber(number);
+							checklose(number);
+							newlist.push(number);
+							var fruitlocal=fruit.getNumber();
+							if(fruitlocal != number){
+								newlist.shift();
+							}else{
+							   sum=sum+1;
+							   $('#score').text(sum);
+							   fruitlocal = unChongfuNumber();
+							   fruit.setNumber(fruitlocal);
+							   fruit.show();
+							}
+							snake.show();
+							oldlist=newlist;
+						}
+                    break;
+                    case 40://下
+						if(direction !=2){
+							direction=4;
+							snake.clean();
+							var number = snake.getNumber();
+							number = number +10;
+							number = number> 100?number-100:number;
+							snake.setNumber(number);
+							checklose(number);
+							newlist.push(number);
+							var fruitlocal=fruit.getNumber();
+							if(fruitlocal != number){
+								newlist.shift();
+							}else{
+							   sum=sum+1;
+							   $('#score').text(sum);
+							   fruitlocal = unChongfuNumber();
+							   fruit.setNumber(fruitlocal);
+							   fruit.show();
+							}
+							snake.show();
+							oldlist=newlist;
+						}
+                    break;
+                }
+            }
+    }
+	
+	</script>
+	
+</head>
+<body>
+	<div id="north">
+	    <div>&nbsp;</div>
+		<div>游戏说明：方向键控制小粉蛇前进方向，游戏没有边界，<br>小蛇吃到红色果子得分，撞到自己身体就游戏结束</div>
+		<div><h1> 得分： <span id="score">0</span>分</h1><div>
+		<!--<span>游戏时间（单位：秒）：<input type="number" id="time"></input>&nbsp;&nbsp;<input type="button" value="开始" id="start"></input></span>-->
+	</div>
+	
+	<div style="height:20px;width:100%;">&nbsp;</div>
+	
+	<div id="center">
+	
+	<div class="block">
+		<table cellpadding="0" cellspacing="0" border="solid 1px black">
+			<tr><td id="block001">&nbsp;</td><td id="block002">&nbsp;</td><td id="block003">&nbsp;</td><td id="block004">&nbsp;</td><td id="block005">&nbsp;</td><td id="block006">&nbsp;</td><td id="block007">&nbsp;</td><td id="block008">&nbsp;<td id="block009">&nbsp;</td></td><td id="block010">&nbsp;</td></tr>
+			<tr><td id="block011">&nbsp;</td><td id="block012">&nbsp;</td><td id="block013">&nbsp;</td><td id="block014">&nbsp;</td><td id="block015">&nbsp;</td><td id="block016">&nbsp;</td><td id="block017">&nbsp;</td><td id="block018">&nbsp;</td><td id="block019">&nbsp;</td></td><td id="block020">&nbsp;</td></tr>
+			<tr><td id="block021">&nbsp;</td><td id="block022">&nbsp;</td><td id="block023">&nbsp;</td><td id="block024">&nbsp;</td><td id="block025">&nbsp;</td><td id="block026">&nbsp;</td><td id="block027">&nbsp;</td><td id="block028">&nbsp;</td><td id="block029">&nbsp;</td></td><td id="block030">&nbsp;</td></tr>
+			<tr><td id="block031">&nbsp;</td><td id="block032">&nbsp;</td><td id="block033">&nbsp;</td><td id="block034">&nbsp;</td><td id="block035">&nbsp;</td><td id="block036">&nbsp;</td><td id="block037">&nbsp;</td><td id="block038">&nbsp;</td><td id="block039">&nbsp;</td></td><td id="block040">&nbsp;</td></tr>
+			<tr><td id="block041">&nbsp;</td><td id="block042">&nbsp;</td><td id="block043">&nbsp;</td><td id="block044">&nbsp;</td><td id="block045">&nbsp;</td><td id="block046">&nbsp;</td><td id="block047">&nbsp;</td><td id="block048">&nbsp;</td><td id="block049">&nbsp;</td></td><td id="block050">&nbsp;</td></tr>
+			<tr><td id="block051">&nbsp;</td><td id="block052">&nbsp;</td><td id="block053">&nbsp;</td><td id="block054">&nbsp;</td><td id="block055">&nbsp;</td><td id="block056">&nbsp;</td><td id="block057">&nbsp;</td><td id="block058">&nbsp;</td><td id="block059">&nbsp;</td></td><td id="block060">&nbsp;</td></tr>
+			<tr><td id="block061">&nbsp;</td><td id="block062">&nbsp;</td><td id="block063">&nbsp;</td><td id="block064">&nbsp;</td><td id="block065">&nbsp;</td><td id="block066">&nbsp;</td><td id="block067">&nbsp;</td><td id="block068">&nbsp;</td><td id="block069">&nbsp;</td></td><td id="block070">&nbsp;</td></tr>
+			<tr><td id="block071">&nbsp;</td><td id="block072">&nbsp;</td><td id="block073">&nbsp;</td><td id="block074">&nbsp;</td><td id="block075">&nbsp;</td><td id="block076">&nbsp;</td><td id="block077">&nbsp;</td><td id="block078">&nbsp;</td><td id="block079">&nbsp;</td></td><td id="block080">&nbsp;</td></tr>
+			<tr><td id="block081">&nbsp;</td><td id="block082">&nbsp;</td><td id="block083">&nbsp;</td><td id="block084">&nbsp;</td><td id="block085">&nbsp;</td><td id="block086">&nbsp;</td><td id="block087">&nbsp;</td><td id="block088">&nbsp;</td><td id="block089">&nbsp;</td></td><td id="block090">&nbsp;</td></tr>
+			<tr><td id="block091">&nbsp;</td><td id="block092">&nbsp;</td><td id="block093">&nbsp;</td><td id="block094">&nbsp;</td><td id="block095">&nbsp;</td><td id="block096">&nbsp;</td><td id="block097">&nbsp;</td><td id="block098">&nbsp;</td><td id="block099">&nbsp;</td></td><td id="block100">&nbsp;</td></tr>
+		</table>
+	</div>
+	
+	<div style="display:none;" id="dialog"><h1 onclick="reFresh()">你输了，哈哈哈哈</h1></div>
+
+</body>
+</html>
